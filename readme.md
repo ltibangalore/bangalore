@@ -1,98 +1,131 @@
-# Kotlin version of the Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-petclinic/spring-petclinic-kotlin.png?branch=master)](https://travis-ci.org/spring-petclinic/spring-petclinic-kotlin/)
+# Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-petclinic/spring-framework-petclinic.svg?branch=master)](https://travis-ci.org/spring-petclinic/spring-framework-petclinic/)
 
-This is a [Kotlin](https://kotlinlang.org/) version of the [spring-petclinic][] Application. 
+Approved by the Spring team, this repo is a fork of the [spring-projects/spring-petclinic](https://github.com/spring-projects/spring-petclinic).
+It allows the Spring community to maintain a Petclinic version with a plain old **Spring Framework configuration**
+and with a **3-layer architecture** (i.e. presentation --> service --> repository).
+The "canonical" implementation is now based on Spring Boot, Thymeleaf and [aggregate-oriented domain]([https://github.com/spring-projects/spring-petclinic/pull/200). 
 
-## Technologies used
 
-* Language: Kotlin
-* Core framework: Spring Boot 2.0 with Spring Framework 5 Kotlin support
-* Server: Netty
-* Web framework: Spring MVC
-* Templates: Thymeleaf and Bootstrap
-* Persistence : Spring Data JPA
-* Databases: H2 and MySQL both supported
-* Build: Gradle Script with the Kotlin DSL
-* Testing: Junit 5, Mockito and AssertJ
+## Understanding the Spring Petclinic application with a few diagrams
+[See the presentation here](http://fr.slideshare.net/AntoineRey/spring-framework-petclinic-sample-application) (2017 update)
 
 ## Running petclinic locally
 ```
-	git clone https://github.com/spring-petclinic/spring-petclinic-kotlin.git
-	cd spring-petclinic-kotlin
-	./gradlew bootRun
+	git clone https://github.com/spring-petclinic/spring-framework-petclinic.git
+	cd spring-framework-petclinic
+	./mvnw tomcat7:run-war
 ```
 
-You can then access petclinic here: http://localhost:8080/
+You can then access petclinic here: http://localhost:9966/petclinic/
 
-<img width="1042" alt="petclinic-screenshot" src="https://user-images.githubusercontent.com/838318/29994372-7f85f6da-8fce-11e7-8896-b5aa075ac0d7.png">
+<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
 
 ## In case you find a bug/suggested improvement for Spring Petclinic
-Our issue tracker is available here: https://github.com/spring-petclinic/spring-petclinic-kotlin/issues
+Our issue tracker is available here: https://github.com/spring-petclinic/spring-framework-petclinic/issues
 
 
 ## Database configuration
 
 In its default configuration, Petclinic uses an in-memory database (HSQLDB) which
-gets populated at startup with data. A similar setup is provided for MySql in case a persistent database configuration is needed.
-Note that whenever the database type is changed, the data-access.properties file needs to be updated and the mysql-connector-java artifact from the pom.xml needs to be uncommented.
+gets populated at startup with data.
+A similar setups is provided for MySql and PostgreSQL in case a persistent database configuration is needed.
+To run petclinic locally using persistent database, it is needed to run with profile defined in main pom.xml file.
 
-You could start a MySql database with docker:
+For MySQL database, it is needed to run with 'MySQL' profile defined in main pom.xml file.
 
 ```
-docker run -e MYSQL_ROOT_PASSWORD=petclinic -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:5.7
+./mvnw tomcat7:run-war -P MySQL
+```
+
+Before do this, would be good to check properties defined in MySQL profile inside pom.xml file.
+
+```
+<properties>
+    <jpa.database>MYSQL</jpa.database>
+    <jdbc.driverClassName>com.mysql.cj.jdbc.Driver</jdbc.driverClassName>
+    <jdbc.url>jdbc:mysql://localhost:3306/petclinic?useUnicode=true</jdbc.url>
+    <jdbc.username>root</jdbc.username>
+    <jdbc.password>petclinic</jdbc.password>
+</properties>
+```      
+
+You may also start a MySql database with docker:
+
+```
+docker run --name mysql-petclinic -e MYSQL_ROOT_PASSWORD=petclinic -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:5.7.8
+```
+
+For PostgreSQL database, it is needed to run with 'PostgreSQL' profile defined in main pom.xml file.
+
+```
+./mvnw tomcat7:run-war -P PostgreSQL
+```
+
+Before do this, would be good to check properties defined in PostgreSQL profile inside pom.xml file.
+
+```
+<properties>
+    <jpa.database>POSTGRESQL</jpa.database>
+    <jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
+    <jdbc.url>jdbc:postgresql://localhost:5432/petclinic</jdbc.url>
+    <jdbc.username>postgres</jdbc.username>
+    <jdbc.password>petclinic</jdbc.password>
+</properties>
+```
+You may also start a Postgres database with docker:
+
+```
+docker run --name postgres-petclinic -e POSTGRES_PASSWORD=petclinic -e POSTGRES_DB=petclinic -p 5432:5432 -d postgres:9.6.0
+```
+
+## Working with Petclinic in Eclipse/STS
+
+### prerequisites
+The following items should be installed in your system:
+* Maven 3 (http://www.sonatype.com/books/mvnref-book/reference/installation.html)
+* git command line tool (https://help.github.com/articles/set-up-git)
+* Eclipse with the m2e plugin (m2e is installed by default when using the STS (http://www.springsource.org/sts) distribution of Eclipse)
+
+Note: when m2e is available, there is an m2 icon in Help -> About dialog.
+If m2e is not there, just follow the install process here: http://eclipse.org/m2e/download/
+
+
+### Steps:
+
+1) In the command line
+```
+git clone https://github.com/spring-petclinic/spring-framework-petclinic.git
+```
+2) Inside Eclipse
+```
+File -> Import -> Maven -> Existing Maven project
 ```
 
 
 ## Looking for something in particular?
 
-| Features                           | Class, files or Java property files  |
-|------------------------------------|---|
-|The Main Class                      | [PetClinicApplication](https://github.com/spring-petclinic/spring-petclinic-kotlin/blob/master/src/main/kotlin/org/springframework/samples/petclinic/PetClinicApplication.kt) |
-|Properties configuration file       | [application.properties](https://github.com/spring-petclinic/spring-petclinic-kotlin/blob/master/src/main/resources) |
-|Gradle build script with Kotlin DSL | [build.gradle.kts](https://github.com/spring-petclinic/spring-petclinic-kotlin/blob/master/build.gradle.kts) |
-|Caching Configuration               | [CacheConfig](https://github.com/spring-petclinic/spring-petclinic-kotlin/blob/master/src/main/kotlin/org/springframework/samples/petclinic/system/CacheConfig.kt) |
+| Java Config |   |
+|-------------|---|
+| Java config branch | Petclinic uses XML configuration by default. In case you'd like to use Java Config instead, there is a Java Config branch available [here](https://github.com/spring-petclinic/spring-framework-petclinic/tree/javaconfig) |
 
+| Inside the 'Web' layer | Files |
+|------------------------|-------|
+| Spring MVC - XML integration | [mvc-view-config.xml](src/main/resources/spring/mvc-view-config.xml)  |
+| Spring MVC - ContentNegotiatingViewResolver| [mvc-view-config.xml](src/main/resources/spring/mvc-view-config.xml) |
+| JSP custom tags | [WEB-INF/tags](src/main/webapp/WEB-INF/tags), [createOrUpdateOwnerForm.jsp](src/main/webapp/WEB-INF/jsp/owners/createOrUpdateOwnerForm.jsp)|
+| JavaScript dependencies | [JavaScript libraries are declared as webjars in the pom.xml](pom.xml) |
+| Static resources config | [Resource mapping in Spring configuration](/src/main/resources/spring/mvc-core-config.xml#L30) |
+| Static resources usage | [staticFiles.jsp](src/main/webapp/WEB-INF/jsp/fragments/staticFiles.jsp#L12) |
+| Thymeleaf | In the late 2016, the original [Spring Petclinic](https://github.com/spring-projects/spring-petclinic) has moved from JSP to Thymeleaf. |
 
-## Import and run the project in IntelliJ IDEA
-   
-* Make sure you have at least IntelliJ IDEA 2017.2 and IDEA Kotlin plugin 1.1.60+ (menu Tools -> Kotlin -> configure Kotlin Plugin Updates -> make sure "Stable" channel is selected -> check for updates now -> restart IDE after the update)
-* Import it in IDEA as a Gradle project
-  * Go to the menu "File -> New -> Project from Existing Sources... "
-  * Select the spring-petclinic-kotlin directory then choose "Import the project from Gradle"
-  * Select the "Use gradle wrapper task configuration" radio button
-* In IntelliJ IDEA, right click on PetClinicApplication.kt then "Run..." or "Debug..."
-* Open http://localhost:8080/ in your browser
-
-
-## Documentation
-
-* [Migrez une application Java Spring Boot vers kotlin](http://javaetmoi.com/2017/09/migrez-application-java-spring-boot-vers-kotlin/) (french)
-* [Migration Spring Web MVC vers Spring WebFlux](http://javaetmoi.com/2017/12/migration-spring-web-mvc-vers-spring-webflux/) (french)
-
-## Interesting Spring Petclinic forks
-
-The Spring Petclinic master branch in the main
-[spring-projects](https://github.com/spring-project/spring-petclinic)
-GitHub org is the "canonical" implementation, currently based on
-Spring Boot and Thymeleaf. 
-
-This [spring-petclinic-kotlin][] project is one of the several forks hosted
-in a special GitHub org: [spring-petclinic](https://github.com/spring-petclinic).
-If you have a special interest in a different technology stack that could
-be used to implement the Pet Clinic then please join the community
-there.
-
-| Link                               | Main technologies |
-|------------------------------------|-------------------|
-| [spring-petclinic][]               | "Canonical" implementation of Spring Petclinic based on Spring Boot and Thymeleaf |
-| [spring-framework-petclinic][]     | Spring Framework XML configuration, JSP pages, 3 persistence layers: JDBC, JPA and Spring Data JPA |
-| [javaconfig branch][]              | Same frameworks as the [spring-framework-petclinic][] but with Java Configuration instead of XML |
-| [spring-petclinic-angularjs][]     | AngularJS 1.x, Spring Boot and Spring Data JPA |
-| [spring-petclinic-angular][]       | Angular 4 front-end of the Petclinic REST API [spring-petclinic-rest][] |
-| [spring-petclinic-microservices][] | Distributed version of Spring Petclinic built with Spring Cloud |
-| [spring-petclinic-reactjs][]       | ReactJS (with TypeScript) and Spring Boot |
-| [spring-petclinic-graphql][]       | GraphQL version based on React Appolo, TypeScript and GraphQL Spring boot starter |
-| [spring-petclinic-kotlin][]        | Kotlin version of [spring-petclinic][] |
-| [spring-petclinic-rest][]          | Backend REST API |
+| 'Service' and 'Repository' layers | Files |
+|-----------------------------------|-------|
+| Transactions | [business-config.xml](src/main/resources/spring/business-config.xml), [ClinicServiceImpl.java](src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java) |
+| Cache | [tools-config.xml](src/main/resources/spring/tools-config.xml), [ClinicServiceImpl.java](src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java) |
+| Bean Profiles | [business-config.xml](src/main/resources/spring/business-config.xml), [ClinicServiceJdbcTests.java](src/test/java/org/springframework/samples/petclinic/service/ClinicServiceJdbcTests.java), [PetclinicInitializer.java](src/main/java/org/springframework/samples/petclinic/PetclinicInitializer.java) |
+| JDBC | [business-config.xml](src/main/resources/spring/business-config.xml), [jdbc folder](src/main/java/org/springframework/samples/petclinic/repository/jdb) |
+| JPA | [business-config.xml](src/main/resources/spring/business-config.xml), [jpa folder](src/main/java/org/springframework/samples/petclinic/repository/jpa) |
+| Spring Data JPA | [business-config.xml](src/main/resources/spring/business-config.xml), [springdatajpa folder](src/main/java/org/springframework/samples/petclinic/repository/springdatajpa) |
 
 
 ## Interaction with other open source projects
@@ -105,26 +138,14 @@ Here is a list of them:
 | Spring JDBC: simplify usage of NamedParameterJdbcTemplate | [SPR-10256](https://jira.springsource.org/browse/SPR-10256) and [SPR-10257](https://jira.springsource.org/browse/SPR-10257) |
 | Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility |[HV-790](https://hibernate.atlassian.net/browse/HV-790) and [HV-792](https://hibernate.atlassian.net/browse/HV-792) |
 | Spring Data: provide more flexibility when working with JPQL queries | [DATAJPA-292](https://jira.springsource.org/browse/DATAJPA-292) |
+| Dandelion: improves the DandelionFilter for Jetty support | [113](https://github.com/dandelion/dandelion/issues/113) |
 
 
 # Contributing
 
-The [issue tracker][] is the preferred channel for bug reports, features requests and submitting pull requests.
+The [issue tracker](/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
 
 For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <http://editorconfig.org>.
-
-
-[issue tracker]: https://github.com/spring-petclinic/spring-petclinic-kotlin/issues
-[spring-petclinic]: https://github.com/spring-projects/spring-petclinic
-[spring-framework-petclinic]: https://github.com/spring-petclinic/spring-framework-petclinic
-[spring-petclinic-angularjs]: https://github.com/spring-petclinic/spring-petclinic-angularjs 
-[javaconfig branch]: https://github.com/spring-petclinic/spring-framework-petclinic/tree/javaconfig
-[spring-petclinic-angular]: https://github.com/spring-petclinic/spring-petclinic-angular
-[spring-petclinic-microservices]: https://github.com/spring-petclinic/spring-petclinic-microservices
-[spring-petclinic-reactjs]: https://github.com/spring-petclinic/spring-petclinic-reactjs
-[spring-petclinic-graphql]: https://github.com/spring-petclinic/spring-petclinic-graphql
-[spring-petclinic-kotlin]: https://github.com/spring-petclinic/spring-petclinic-kotlin
-[spring-petclinic-rest]: https://github.com/spring-petclinic/spring-petclinic-rest
 
 
 
